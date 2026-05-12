@@ -1,0 +1,137 @@
+<!-- Stats row -->
+<div class="stats">
+  <div class="stat">
+    <div class="num">{{ planner.tasks.length }}</div>
+    <div class="lbl">Total</div>
+  </div>
+  <div class="stat">
+    <div class="num">{{ completedCount }}</div>
+    <div class="lbl">Done</div>
+  </div>
+  <div class="stat">
+    <div class="num">{{ planner.tasks.length - completedCount }}</div>
+    <div class="lbl">Remaining</div>
+  </div>
+</div>
+
+<!-- Progress bar -->
+<div class="progress-bar">
+  <div class="progress-fill" [style.width.%]="progress"></div>
+</div>
+
+<!-- Add Task Form -->
+<div class="panel">
+  <div class="panel-label">Add task</div>
+  <div class="row">
+    <input [(ngModel)]="text" placeholder="What needs to be done?"
+           (keydown.enter)="addTask()" />
+    <input type="time" [(ngModel)]="time" />
+  </div>
+  <div class="row">
+    <select [(ngModel)]="priority">
+      <option value="medium">Medium priority</option>
+      <option value="high">High priority</option>
+      <option value="low">Low priority</option>
+    </select>
+    <select [(ngModel)]="category">
+      <option value="work">Work</option>
+      <option value="personal">Personal</option>
+      <option value="health">Health</option>
+      <option value="finance">Finance</option>
+      <option value="other">Other</option>
+    </select>
+    <select [(ngModel)]="recur">
+      <option value="none">No repeat</option>
+      <option value="daily">Daily</option>
+      <option value="weekly">Weekly</option>
+      <option value="weekdays">Weekdays</option>
+      <option value="weekend">Weekends</option>
+    </select>
+  </div>
+  <div class="row">
+    <textarea [(ngModel)]="note" placeholder="Add a note (optional)..."></textarea>
+    <button class="add-btn" (click)="addTask()">+ Add</button>
+  </div>
+</div>
+
+<!-- Search bar -->
+<div class="search-wrap">
+  <span class="search-icon">🔍</span>
+  <input class="search-input" [(ngModel)]="searchQuery"
+         placeholder="Search tasks by title or note..." />
+  <button *ngIf="searchQuery" class="clear-btn" (click)="searchQuery = ''">✕</button>
+</div>
+
+<!-- Filter chips -->
+<div class="filter-row">
+  <button *ngFor="let p of ['high','medium','low']"
+          class="chip" [class.active]="filterPriority === p"
+          (click)="filterPriority = filterPriority === p ? 'all' : p">
+    {{ p }}
+  </button>
+  <span class="sep"></span>
+  <button *ngFor="let c of ['work','personal','health','finance','other']"
+          class="chip" [class.active]="filterCategory === c"
+          (click)="filterCategory = filterCategory === c ? 'all' : c">
+    {{ c }}
+  </button>
+  <span *ngIf="searchQuery || filterPriority !== 'all' || filterCategory !== 'all'"
+        class="result-count">
+    {{ filteredTasks.length }} of {{ planner.tasks.length }}
+  </span>
+</div>
+
+<!-- Empty state -->
+<div *ngIf="filteredTasks.length === 0" class="empty">
+  {{ searchQuery ? 'No tasks match "' + searchQuery + '"' : 'No tasks yet — add one above!' }}
+</div>
+
+<!-- Task list -->
+<div *ngFor="let task of filteredTasks"
+     class="task-card"
+     [class.done]="task.done"
+     [ngClass]="'p-' + task.priority">
+
+  <button class="check-btn" [class.done]="task.done"
+          (click)="planner.toggleTask(task.id)">
+    <span *ngIf="task.done">✓</span>
+  </button>
+
+  <div class="task-body">
+    <div class="task-text">{{ task.text }}</div>
+
+    <div class="task-meta">
+      <span class="pill" [ngClass]="'pri-' + task.priority">{{ task.priority }}</span>
+      <span class="pill" [ngClass]="'cat-' + task.category">{{ task.category }}</span>
+      <span *ngIf="task.recur !== 'none'" class="pill recur">↻ {{ task.recur }}</span>
+      <span *ngIf="task.time" class="pill time">🕐 {{ task.time }}</span>
+    </div>
+
+    <!-- Note toggle -->
+    <button *ngIf="task.note && editingNoteId !== task.id"
+            class="note-toggle"
+            (click)="toggleNoteExpand(task.id)">
+      {{ expandedNoteIds.has(task.id) ? '▲ Hide note' : '▼ Show note' }}
+    </button>
+
+    <!-- Note content -->
+    <div *ngIf="task.note && expandedNoteIds.has(task.id) && editingNoteId !== task.id"
+         class="task-note">
+      {{ task.note }}
+    </div>
+
+    <!-- Note editor -->
+    <div *ngIf="editingNoteId === task.id" class="note-editor">
+      <textarea [(ngModel)]="editingNoteText"></textarea>
+      <button class="note-save-btn" (click)="saveNote(task.id)">✓ Save note</button>
+    </div>
+  </div>
+
+  <div class="card-actions">
+    <button class="icon-btn" (click)="openNoteEditor(task)"
+            [title]="task.note ? 'Edit note' : 'Add note'">
+      {{ task.note ? '📝' : '📄' }}
+    </button>
+    <button class="icon-btn del" (click)="planner.deleteTask(task.id)" title="Delete">✕</button>
+  </div>
+</div>

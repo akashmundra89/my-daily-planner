@@ -1,0 +1,50 @@
+<!-- Month navigation -->
+<div class="cal-header">
+  <button class="cal-nav" (click)="navigate(-1)">‹</button>
+  <span class="cal-title">{{ monthLabel }}</span>
+  <button class="cal-nav" (click)="navigate(1)">›</button>
+</div>
+
+<!-- Day-of-week headers -->
+<div class="cal-grid">
+  <div class="dow" *ngFor="let d of dowLabels">{{ d }}</div>
+
+  <!-- Calendar days -->
+  <ng-container *ngFor="let week of weeks">
+    <div *ngFor="let day of week"
+         class="cal-day"
+         [class.other-month]="day.otherMonth"
+         [class.today]="day.date === today"
+         [class.selected]="day.date === selected"
+         (click)="selected = day.date">
+      <div class="day-num">{{ day.dayNum }}</div>
+      <div class="dots">
+        <span *ngFor="let t of tasksOnDay(day.date).slice(0, 4)"
+              class="dot"
+              [style.background]="dotColor(t.category)">
+        </span>
+      </div>
+    </div>
+  </ng-container>
+</div>
+
+<!-- Selected day task list -->
+<div class="day-tasks">
+  <div class="day-tasks-title">{{ selectedLabel }}</div>
+
+  <div *ngIf="selectedDayTasks.length === 0" class="empty">
+    No tasks this day.
+  </div>
+
+  <div *ngFor="let t of selectedDayTasks"
+       class="task-card" [ngClass]="'p-' + t.priority" [class.done]="t.done">
+    <div class="task-text">{{ t.text }}</div>
+    <div class="task-meta">
+      <span class="pill" [ngClass]="'pri-' + t.priority">{{ t.priority }}</span>
+      <span class="pill" [ngClass]="'cat-' + t.category">{{ t.category }}</span>
+      <span *ngIf="t.recur !== 'none'" class="pill recur">↻ {{ t.recur }}</span>
+      <span *ngIf="t.time" class="pill time">🕐 {{ t.time }}</span>
+    </div>
+    <div *ngIf="t.note" class="task-note">{{ t.note }}</div>
+  </div>
+</div>

@@ -1,0 +1,54 @@
+<!-- Export -->
+<div class="panel">
+  <div class="panel-label">Export data</div>
+  <div class="btn-grid">
+    <button class="export-btn" (click)="exportJSON()">
+      <span class="export-icon" style="background:#EEEDFE;">📦</span>
+      <div>
+        <div class="btn-label">Export JSON</div>
+        <div class="btn-sub">Full backup, all data</div>
+      </div>
+    </button>
+    <button class="export-btn" (click)="exportCSV()">
+      <span class="export-icon" style="background:#E1F5EE;">📊</span>
+      <div>
+        <div class="btn-label">Export CSV</div>
+        <div class="btn-sub">Tasks spreadsheet</div>
+      </div>
+    </button>
+  </div>
+</div>
+
+<!-- Import -->
+<div class="panel">
+  <div class="panel-label">Import / Restore</div>
+  <label class="upload-label">
+    <span style="font-size:24px;">⬆</span>
+    Click to upload a JSON backup
+    <input type="file" accept=".json" (change)="onFileUpload($event)" style="display:none" />
+  </label>
+  <p *ngIf="importMsg" class="import-msg" [class.error]="importError">
+    {{ importMsg }}
+  </p>
+</div>
+
+<!-- Danger zone -->
+<div class="panel danger-panel">
+  <div class="panel-label">Danger zone</div>
+  <div class="btn-grid">
+    <button class="danger-btn" (click)="clearTasks()">
+      <span class="export-icon" style="background:#FCEBEB;">🗑</span>
+      <div>
+        <div class="btn-label danger-label">Clear tasks</div>
+        <div class="btn-sub">Remove all tasks</div>
+      </div>
+    </button>
+    <button class="danger-btn" (click)="clearAll()">
+      <span class="export-icon" style="background:#FCEBEB;">⚠️</span>
+      <div>
+        <div class="btn-label danger-label">Clear all data</div>
+        <div class="btn-sub">Reset everything</div>
+      </div>
+    </button>
+  </div>
+</div>
